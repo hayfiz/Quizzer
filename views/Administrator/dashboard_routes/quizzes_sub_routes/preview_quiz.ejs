@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<!--        <link rel="stylesheet" href="main.css">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div id="quiz_heading" class="col-md-7">
+                    <h1> <%= data.quizName %> </h1>
+                </div>
+                <div class="col-md-1" style="padding-top: 30px;">
+                    <a href="quizzes"> Back <span class="glyphicon glyphicon-chevron-left"></span></a>
+                </div>
+                <div class="col-md-2" style="padding-top: 30px;">
+                    <a href="dashboard">Return to dashboard <span class="glyphicon glyphicon-chevron-left"></span></a>
+                </div>
+                <div style="padding-top: 30px;">
+                    <a href="logout">Logout <span class="glyphicon glyphicon-user"></span></a>
+                </div>
+            </div>
+            
+            <div id="quiz_description">
+                <h4> <%= data.quizDescription %></h4>
+            </div>
+            <div>
+                Time limit: <span id="time"> <%=data.timeLimit%></span>
+            </div>
+            <div>
+                    <%for (var i=0; i<data.questions.length; i++) {%>
+                    <%if (data.questions[i].type==="true/false") {%>
+                            <h5 id="question_<%=i+1%>_text">
+                              Question <%=i+1%>: <%=data.questions[i].text%>
+                            </h5>
+                            <ul>
+                                <li>
+                                   <input type="radio" name="question_<%=i+1%>_choice" value="True" id="true" disabled/> True 
+                                </li>
+                                <li>
+                                    <input type="radio" name="question_<%=i+1%>_choice" value="False" id="False" disabled/> False
+                                </li>
+                            </ul>
+                            <br>
+                    <% } else if (data.questions[i].type==="multipleChoice") {%>
+                        <h5 id="question_<%=i+1%>_text">
+                              Question <%=i+1%>: <%=data.questions[i].text%>
+                            </h5>
+                        <ul>
+                            <% for (j=0; j<data.questions[i].Optiontext.length; j++) {%>
+                                <li>
+                                    <input type="radio" name="question_<%=i+1%>_choice" value="<%=j%>" id="choice" disabled/> <%= data.questions[i].Optiontext[j]%>
+                                </li>
+                            <% } %>
+                        </ul>
+                        <br>
+                    <% } else if (data.questions[i].type==="fillInTheBlank") {%>
+                        <h5 id="question_<%=i+1%>_text">
+                              Question <%=i+1%>: <%=data.questions[i].text%>
+                            </h5>
+                        <input type="text" class='form-control' name="question_<%=i+1%>_choice" placeholder="Enter answer here" value="<%=data.questions[i].correctOption%>" disabled/>
+                        <br>
+                    <% } else if (data.questions[i].type==="essay") {%>
+                        <h5 id="question_<%=i+1%>_text">
+                              Question <%=i+1%>: <%=data.questions[i].text%>
+                            </h5>
+                        <input type="text" class='form-control' name="question_<%=i+1%>_choice" placeholder="Enter answer here" value="<%=data.questions[i].correctOption%>" disabled/>
+                        <br>
+                    <% } %>
+
+                    <%}%>
+                    <input type="hidden" id="datax" name="data" value="<%= JSON.stringify(data)%>"></input>
+                    <button id="edit" class="btn btn-default">
+                        Edit
+                    </button>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $('#edit').on('click', function function_name(argument) {
+                //edit quiz request
+                var post = $('#datax').val();
+                console.log(post);
+                var form = $("<form></form>");
+                        form.attr('action', 'edit_quiz')
+                            .attr('method', 'POST');
+                        form.append($('<input />').attr('name','data').attr('value',post).attr('type', 'hidden'));
+
+                     form.submit();
+                console.log('clicked');
+            })
+        </script>
+    </body>
+</html>

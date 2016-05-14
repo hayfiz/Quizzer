@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<!--        <script src="js/app.js"></script>-->
+<!--        <link rel="stylesheet" href="main.css">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+        <% if (isAuthenticated) {%>
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1> <%= quiz.quizName %> Evaluation </h1>
+                </div>
+                <div class="col-lg-1" style="padding-top: 30px;">
+                    <a href="responses"> Back <span class="glyphicon glyphicon-chevron-left"></span></a>
+                </div>
+                <div class="col-lg-2" style="padding-top: 30px;">
+                    <a href="dashboard">Return to dashboard <span class="glyphicon glyphicon-chevron-left"></span></a>
+                </div>
+                <div class="col-lg-1" style="padding-top: 30px;">
+                    <a href="logout">Logout <span class="glyphicon glyphicon-user"></span></a>
+                </div>
+            </div>
+            <div>
+                <form id="response" method="POST" action="save_graded_response">
+                    <input type="hidden" name="quizName" value="<%=response.quizName%>"></input>
+                    <input type="hidden" name="studentID" value="<%=response.studentID%>"></input>
+                    <input type="hidden" name="creator_username" value="<%=response.creator_username%>"></input>
+                    <input type="hidden" name="attempted" value="<%=response.attempted%>"></input>
+                    <%for (var i=0; i<quiz.questions.length; i++) {%>
+                        <% if (response.questions['Question '+(i+1)].choice != undefined) { %>
+                        <input type="hidden" name="question_<%=(i+1)%>_response" value="<%=response.questions['Question '+(i+1)].choice%>"></input>
+                        <%}%>
+                    <%}%>
+                    <% for (var i=0; i<quiz.questions.length; i++) {%>
+                        <% if (response.questions['Question '+(i+1)].choice!= undefined) {%>
+                        <p>Question <%=(i+1)%> Response: <%=response.questions['Question '+(i+1)].choice%></p> 
+                        <%} else {%>
+                        <p>Question <%=(i+1)%> Response: <%=response.questions['Question '+(i+1)].choice%></p>
+                        <%}%>
+                        <p>Correct Answer: <%=quiz.questions[i].correctOption%></p> 
+                        <input type="hidden" name="question_<%=(i+1)%>_original" id="question_<%=(i+1)%>_original" value="<%=response.grades['Question '+(i+1)].grade%>"/>
+                        Grade: <input type="text" class="form-control" name="question_<%=(i+1)%>_grade"id="question_<%=(i+1)%>_grade" value="<%=response.grades['Question '+(i+1)].grade%>"/>
+                        <br>
+                        <%}%>
+                        <p >Score: <span id="score"></span></p>
+                        <input type="hidden" name="score" id="score_input"></input>
+                        <div id="submit form-group">
+                            <button type="submit" class="btn btn-default" id="save">Save Grades</button>
+                        </div>
+                </form>
+            </div>
+           <%} else { %>
+            <h3>You must be logged in to view this page. <a href="login">Log in</a></h3>
+        <% } %>
+        </div>
+        <script type="text/javascript">
+            function findTotal(){
+                var tot = 0;
+                for (var i=0; i<<%=quiz.questions.length%>; i++) {
+                    tot+=(parseInt($('#question_'+(i+1)+'_grade').val()));
+                }
+             $('#score').html(tot); 
+             $('#score_input').val(tot);  
+                
+            }
+
+            
+
+            $(document).ready(function () {
+                // if ( == null) {
+                //     findTotal();
+                // }; 
+                console.log($('#score_input').val());
+                findTotal();
+                $('#response').keyup(function(e) {
+                    findTotal();
+                });
+
+               //  $('.panel-group').click(function (e) {
+               //      if (e.target !== e.currentTarget) {
+               //             var selector = e.target.id;
+               //             e.preventDefault();
+               //             getData(selector);
+               //       };
+               // });
+            });
+            // function getData(selector) {
+            //     var post = $("#"+selector).val();
+            //     var url = $("#"+selector).attr('url');
+            //     var req = $("#"+selector).attr('req');
+                
+            //     if (req == 0) {
+            //             $.ajax({
+            //             'url': url,
+            //             'type': 'POST',
+            //             'dataType': 'json', 
+            //             'data': {data: post},
+            //             success: function (response) {
+            //                 var str = response.quizName;
+            //                 var rep = str.replace(" ", "_");
+            //                 $('#'+rep).remove();
+            //                 //console.log(response);
+            //             }
+            //         });
+            //     }
+            //     else if (req == 1) {
+            //         //console.log(post);
+            //         var form = $("<form></form>");
+            //             form.attr('action', url)
+            //                 .attr('method', 'POST');
+            //             form.append($('<input />').attr('name','data').attr('value',post).attr('type', 'hidden'));
+
+            //          form.submit();
+            //         }
+            // };
+
+            // $(document).ready(function () {
+            //     $('.panel-group').click(function (e) {
+            //         if (e.target !== e.currentTarget) {
+            //                var selector = e.target.id;
+            //                e.preventDefault();
+            //                getData(selector);
+            //          };
+            //    });
+            // });
+        </script>
+    </body>
+</html>

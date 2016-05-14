@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<!--        <link rel="stylesheet" href="main.css">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+            <form id="signup" action="signup" method="POST">
+                <div class="row" >
+                    <div class="form-group col-md-3" id="usernameDiv">
+                        <label class="sr-only" for="Username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="username" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="sr-only" for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password"placeholder="password" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="sr-only" for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name"placeholder="name" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6" id="emailDiv">
+                        <label class="sr-only" for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email"placeholder="email" required>
+                    </div>
+                </div>
+                <div id="submit">
+                    <button type="submit" class="btn btn-default" id="submitbtn">Signup</button>
+                </div>
+            </form>
+        </div>    
+    </body>
+    <script type="text/javascript">
+        function validateEmail(email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var result = re.test(email);
+            if ( result == true ) {
+                $('#feeback2').remove();
+                $('#emailDiv').attr('class', 'form-group col-md-6 has-success has-feedback')
+                .append('<span id="feeback2" class="glyphicon glyphicon-ok form-control-feedback"></span>');
+                $('#email').attr('class', 'form-control form-control-success');
+                $("#submitbtn").prop('disabled', false);
+            } else {
+                $('#feeback2').remove();
+                $('#emailDiv').attr('class', 'form-group col-md-3 has-warning has-feedback')
+                .append('<span id="feeback2" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>');
+                $('#email').attr('class', 'form-control form-control-warning');
+                $("#submitbtn").prop('disabled', true);
+            }
+        }
+
+        function checkUsernameAvailability() {
+            var post = $('#username').val();
+            $.ajax({
+                        'url': 'checkUsername',
+                        'type': 'POST',
+                        'data': {data: post},
+                        success: function (response) {
+                            console.log(response);
+                            if (response == 'valid') {
+                                $('#feeback').remove();
+                                $('#usernameDiv').attr('class', 'form-group col-md-3 has-success has-feedback')
+                                .append('<span id="feeback" class="glyphicon glyphicon-ok form-control-feedback"></span>');
+                                $('#username').attr('class', 'form-control form-control-success');
+                                $("#submitbtn").prop('disabled', false);
+                            } else {
+                                $('#feeback').remove();
+                                $('#usernameDiv').attr('class', 'form-group col-md-3 has-warning has-feedback')
+                                .append('<span id="feeback" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>');
+                                $('#username').attr('class', 'form-control form-control-warning');
+                                $("#submitbtn").prop('disabled', true);
+                            }
+                            }
+                        });
+        }
+        $(document).ready(function() {
+            $('#username').keyup(function(e) {
+                checkUsernameAvailability();
+            });
+            $('#email').keyup(function(e) {
+            validateEmail($('#email').val());
+            })
+        });
+    </script>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<!--        <script src="js/app.js"></script>-->
+<!--        <link rel="stylesheet" href="main.css">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+        <%if (data.active == false) {%>
+            <h3>The quiz you are trying to attempt is not yet active. Please try again later</h3>
+            <%} else {%>
+
+            <div id="quiz_heading">
+                <h1> <%= data.quizName %> </h1>
+            </div>
+            <div id="quiz_description">
+                <h4> <%= data.quizDescription %></h4>
+            </div>
+            <div>
+                <span id="time"></span>
+            </div>
+            <div>
+                <form id="quiz_responses" method="POST" action="submitQuiz">
+                    <input type='hidden' name='quizName' value="<%= data.quizName %>">
+                    <%for (var i=0; i<data.questions.length; i++) {%>
+
+                    <%if (data.questions[i].type==="true/false") {%>
+                            <h5 id="question_"+ <%i+1%>+ "_text">
+                              Question <% i+1 %>: <%=data.questions[i].text%>
+                            </h5>
+                            <ul>
+                                <li>
+                                   <input type="radio" name="question_<%=i+1%>_choice" value="True" id="true" /> True 
+                                </li>
+                                <li>
+                                    <input type="radio" name="question_<%=i+1%>_choice" value="False" id="False" /> False
+                                </li>
+                            </ul>
+                            <br>
+                    <% } else if (data.questions[i].type==="multipleChoice") {%>
+                        <h5 id="question_<%=i+1%>_text">
+                              Question <% i+1 %>: <%=data.questions[i].text%>
+                        </h5>
+                        <ul>
+                            <% for (j=0; j<data.questions[i].Optiontext.length; j++) {%>
+                                <li>
+                                    <input type="radio" name="question_<%=i+1%>_choice" value="<%=j%>" id="choice" /> <%= data.questions[i].Optiontext[j]%>
+                                </li>
+                            <% } %>
+                        </ul>
+                        <br>
+                    <% } else if (data.questions[i].type==="fillInTheBlank") {%>
+                        <h5 id="question_<%=i+1%>_text">
+                              Question <% i+1 %>: <%=data.questions[i].text%>
+                        </h5>
+                        <input type="text" name="question_<%=i+1%>_choice" placeholder="Enter answer here"/>
+                        <br>
+                    <% } else if (data.questions[i].type==="essay") {%>
+                        <h5 id="question_<%=i+1%>_text">
+                              Question <% i+1 %>: <%=data.questions[i].text%>
+                        </h5>
+                        <input type="text" name="question_<%=i+1%>_choice" placeholder="Enter answer here"/>
+                        <br>
+                    <% } %>
+
+                    <%}%>
+                    <button id="submitQuiz" class="btn btn-default" onclick="function() {
+                                            if (confirm('Are you sure you want to submit?')) {
+                               $('#quiz_reponses').submit();
+                           } else {
+                               return false;
+                           }
+                        };">
+                        Submit
+                    </button>
+                </form>
+            </div>
+            <%}%>
+        </div>
+        <script>
+        $(document).ready(addTimer());
+            /*Code adapted from http://stackoverflow.com/questions/20618355/the-simplest-possible-javascript-countdown-timer 
+                    Originally written by Mike Robb
+                    */
+                    function addTimer() {
+                    function CountDownTimer(duration, granularity) {
+                          this.duration = duration;
+                          this.granularity = granularity || 1000;
+                          this.tickFtns = [];
+                          this.running = false;
+                    }
+
+                    CountDownTimer.prototype.start = function() {
+                        if (this.running) {
+                            return;
+                        }
+                        this.running = true;
+                        var start = Date.now(),
+                              that = this,
+                              diff, obj;
+                        (function timer() {
+                            diff = that.duration - (((Date.now() - start) / 1000) | 0);
+
+                        if (diff > 0) {
+                          setTimeout(timer, that.granularity);
+                        } else {
+                          diff = 0;
+                          that.running = false;
+                        }
+
+                            obj = CountDownTimer.parse(diff);
+                            that.tickFtns.forEach(function(ftn) {
+                              ftn.call(this, obj.minutes, obj.seconds);
+                            }, that);
+                        }());
+                    };
+
+                    CountDownTimer.prototype.onTick = function(ftn) {
+                        if (typeof ftn === 'function') {
+                            this.tickFtns.push(ftn);
+                        }
+                            return this;
+                        };
+
+                    CountDownTimer.prototype.expired = function() {
+                          return !this.running;
+                        };
+
+                    CountDownTimer.parse = function(seconds) {
+                          return {
+                            'minutes': (seconds / 60) | 0,
+                            'seconds': (seconds % 60) | 0
+                            };
+                        };
+
+                    function format(minutes, seconds) {
+                        minutes = minutes < 10 ? "0" + minutes : minutes;
+                        seconds = seconds < 10 ? "0" + seconds : seconds;
+                        displayTimer.textContent = minutes + ':' + seconds;
+                    };
+
+                    /********************************************************/   
+                    var timeLimit = '<%=data.timeLimit%>';
+                    time_limit_parts = timeLimit.split(":");
+
+                    minutes = parseInt(time_limit_parts[0])*60;
+                    seconds = parseInt(time_limit_parts[1])
+                    duration = minutes+seconds;
+//console.log();  
+
+                    var displayTimer = document.querySelector('#time'),
+                        timer = new CountDownTimer(duration),
+                        timeObj = CountDownTimer.parse(duration);
+
+                    format(timeObj.minutes, timeObj.seconds);
+
+                    timer.onTick(format).onTick(checkTimer);
+                    timer.start();
+
+                    function checkTimer() {
+                        if (this.expired()) {
+                            //$('#quiz_reponses').submit();
+                            alert("The available quiz duration has expired");
+                            $('#submitQuiz').click();
+                            
+                            console.log('expired');
+                        }
+                    }
+ 
+                        
+                    }; 
+
+                    function createTimer() {
+                        var timer = $("<div><span id='time'></span></div>");
+                            timer.attr('id','timer');
+                            
+                            return timer;
+                    }
+        </script>
+    </body>
+</html>

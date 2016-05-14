@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<!--        <script src="js/app.js"></script>-->
+<!--        <link rel="stylesheet" href="main.css">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+        <% if (isAuthenticated) {%>
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1> <%= data.quizName %> Evaluation </h1>
+                </div>
+                <div class="col-lg-1" style="padding-top: 30px;">
+                    <a href="responses"> Back <span class="glyphicon glyphicon-chevron-left"></span></a>
+                </div>
+                <div class="col-lg-2" style="padding-top: 30px;">
+                    <a href="dashboard">Return to dashboard <span class="glyphicon glyphicon-chevron-left"></span></a>
+                </div>
+                <div class="col-lg-1" style="padding-top: 30px;">
+                    <a href="logout">Logout <span class="glyphicon glyphicon-user"></span></a>
+                </div>
+            </div>
+            <div id="responses">
+                <%for (response in data.responses) {%>
+                    <% var number = parseInt(response) + 1%>
+                    <input type="hidden" id="eval_<%=response%>" value="<%= JSON.stringify(data.responses[response]) %>" url="eval_specific" req="1">
+                    <a href="" id="eval_<%=response%>"> Response <%= number %> </a><br>
+                <%}%>
+            </div>
+           <%} else {%>
+                <h3>You must be logged in to view this page. <a href="login">Log in</a></h3>
+           <%}%> 
+        </div>
+        <script type="text/javascript">
+            function getData(selector) {
+                var post = $("#"+selector).val();
+                var url = $("#"+selector).attr('url');
+                console.log(url);
+                var req = $("#"+selector).attr('req');
+                
+                if (req == 0) {
+                        $.ajax({
+                        'url': url,
+                        'type': 'POST', 
+                        'data': {data: post},
+                        success: function (response) {
+                            var str = response.quizName;
+                            var rep = str.replace(" ", "_");
+                            $('#'+rep).remove();
+                            //console.log(response);
+                        }
+                    });
+                }
+                else if (req == 1) {
+                    //console.log(post);
+                    var form = $("<form></form>");
+                        form.attr('action', url)
+                            .attr('method', 'POST');
+                        form.append($('<input />').attr('name','data').attr('value',post).attr('type', 'hidden'));
+
+                     form.submit();
+                    }
+            };
+
+            $(document).ready(function () {
+                $('#responses').click(function (e) {
+                    if (e.target !== e.currentTarget) {
+                           var selector = e.target.id;
+                           e.preventDefault();
+                           getData(selector);
+                     };
+               });
+            });
+        </script>
+    </body>
+</html>

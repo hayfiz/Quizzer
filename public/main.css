@@ -1,0 +1,58 @@
+div #create_quiz{
+    background-color: white;
+}
+
+.center {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+}
+
+#logo {
+	position: relative;
+	padding-left: 60px;
+}
+
+#logo-min {
+	position: relative;
+	width: 27%;
+	height: 10%;
+	padding-top: 10px;
+}
+
+#questions {
+	padding-bottom: 10px;
+}
+
+#dash-control {
+	padding-top: 30px
+}
+
+#rectangle {
+	padding-top: 76px;
+}
+
+/*#active_rect {
+	width:160px;
+    height:30px;
+    border: solid;
+    margin-bottom: 1px;
+    padding-bottom: 5px;
+}
+
+#pool_rect {
+	width:160px;
+    height:30px;
+    border: solid;
+}
+
+#active_link {
+	text-align: center;
+}
+
+#pool_link {
+	position: relative;
+}*/

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<!--        <script src="js/app.js"></script>-->
+<!--        <link rel="stylesheet" href="main.css">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+        <%if (data.feedback != "no_instant_feedback") {%>
+            <h3 id="score">
+                You scored <%=data.score%> out of <%=data.tot_pos%>.
+            </h3>
+            <%if (data.incorrect.length > 0) {%>
+            <h3 id="incorrect">
+                You answered question(s) <%=data.incorrect%> wrong.
+            </h3>
+            <% } else {%>
+            <h3 id="incorrect">
+                You answered all questions correctly :)
+            </h3> 
+            <%}%>
+            <form action="takeQuiz" method="POST">
+                <button type="button" class="btn btn-primary <%if (data.remaining_attempts <= 0) {%> disabled <%}%>" onclick="submit()" <%if (data.remaining_attempts <= 0) {%> disabled <%}%>>Retake Quiz</button>
+            </form>
+            <form action="provide_feedback" method="POST">
+                <input type="hidden"  value="<%= JSON.stringify(data)%>"/>
+                <button type="button" class="btn btn-default" onclick="submit()">Provide Feedback</button>
+            </form>
+            <br>
+            <a href="/">
+                <button type="button" class="btn btn-default">Exit</button>
+            </a>
+         <%} else {%>
+            <h3> Your responses have been saved. </h3>
+            <form action="takeQuiz" method="POST">
+                <button type="button" class="btn btn-primary <%if (data.remaining_attempts <= 0) {%> disabled <%}%>" onclick="submit()" <%if (data.remaining_attempts <= 0) {%> disabled <%}%>>Retake Quiz</button>
+            </form>
+            <br>
+            <form action="provide_feedback" method="POST">
+                <input type="hidden" name="quizName" value="<%= data.quizName%>"/>
+                <input type="hidden" name="creator_username" value="<%= data.creator_username%>"/>
+                <button type="button" class="btn btn-default" onclick="submit()">Provide Feedback</button>
+            </form>
+            <br>
+            <a href="/">
+                <button type="button" class="btn btn-default">Exit</button>
+            </a>
+         <%}%>
+        </div>
+    </body>
+</html>

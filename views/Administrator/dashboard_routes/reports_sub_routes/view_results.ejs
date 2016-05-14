@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+        <% if (isAuthenticated) {%>
+            
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1> <%= data[0].quizName %> Results </h1>
+                </div>
+                <div class="col-lg-1" style="padding-top: 30px;">
+                    <a href="reports"> Back <span class="glyphicon glyphicon-chevron-left"></span></a>
+                </div>
+                <div class="col-lg-2" style="padding-top: 30px;">
+                    <a href="dashboard">Return to dashboard <span class="glyphicon glyphicon-chevron-left"></span></a>
+                </div>
+                <div class="col-lg-1" style="padding-top: 30px;">
+                    <a href="logout">Logout <span class="glyphicon glyphicon-user"></span></a>
+                </div>
+            </div>
+            <table class="table table-hover">
+                <thead>
+                    <th>
+                        User ID
+                    </th> 
+                    <th>
+                        Score
+                    </th>
+                </thead>
+                <tbody>
+                    <% for (index in data) { %>
+                        <tr>
+                            <td>
+                                <%=data[index].studentID%>
+                            </td>
+                            <td>
+                                <%=data[index].score%>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <form id="download" action="download_scores" method="POST" onsubmit="return false;" >
+                <input type="hidden" id="data" value="<%=JSON.stringify(data)%>" name="data"></input>
+                <button class="btn btn-primary"> Download Results</button>
+            </form>
+           <%} else { %>
+            <h3>You must be logged in to view this page. <a href="login">Log in</a></h3>
+        <% } %>
+        </div>
+    </body>
+    <script type="text/javascript">
+        $('#download').submit(function function_name(argument) {
+            // body...
+            var data = $('#data').val();
+            $.ajax({
+                        'url': 'download_scores',
+                        'type': 'POST', 
+                        'data': {data: data},
+                        success: function(response) {
+                            console.log('response');
+                        }
+                    });
+        })
+    </script>
+</html>

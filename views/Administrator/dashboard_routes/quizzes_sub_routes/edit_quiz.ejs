@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <!-- <script src="app.js"></script> -->
+<!--        <link rel="stylesheet" href="main.css">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+            <% if (isAuthenticated) {%>
+            <div class="row">
+            <div class="col-md-6">
+                     <h1>Edit Quiz</h1>   
+                    </div>
+                    <div class="col-md-1" style="padding-top: 30px;">
+                    <a href="quizzes"> Back <span class="glyphicon glyphicon-chevron-left"></span></a>
+                    </div>
+                    <div class="col-md-2" style="padding-top: 30px;">
+                        <a href="dashboard">Return to dashboard <span class="glyphicon glyphicon-chevron-left"></span></a>
+                    </div>
+                    <div class="col-md-1" style="padding-top: 30px;">
+                    <a href="logout">Logout <span class="glyphicon glyphicon-user"></span></a>
+                </div>
+        </div>
+            <form id="editQuiz" action="update_quiz" method="POST">
+                <div class="row">
+                    <div class="form-group col-md-3">
+                        <label class="sr-only" for="quizName">Quiz Name</label>
+                        <input type="text" class="form-control" id="quizName" name="quizName" placeholder="Quiz Name*" value="<%= data.quizName %>">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="sr-only" for="quizDescription">Quiz Description</label>
+                        <input type="text" class="form-control" id="quizDescription" name="quizDescription" placeholder="Quiz Description*" value="<%= data.quizDescription %>">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <input type="text" class="form-control" id="timeLimit" name="timeLimit" placeholder="Enter time limit (mm:ss)" value="<%=data.timeLimit%>"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <input type="text" class="form-control"id="attemptLimit" name="attemptLimit" placeholder="Enter max no. of attempts" value="<%=data.attemptLimit%>" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="checkbox col-md-4">
+                        <label>
+                            <input type="checkbox" id="instantFeedbackCheckbox" name="feedback" value="YES" <%if (data.feedback == "YES") {%> checked<%}%>> Allow instant feedback?
+                        </label>
+                    </div>    
+                </div>
+                <div class="row">
+                    <div class="checkbox col-md-4">
+                        <label>
+                            <input type="checkbox" id="activate" name="activate" value="YES"<%if (data.active == true) {%> checked<%}%>>
+                            Activate?
+                        </label>
+                    </div>    
+                </div>
+                <div class="row">
+                    <div class="checkbox col-md-4">
+                        <label>
+                            <input type="checkbox" id="randomiseQuestionsCheckbox" name="randomise" value="YES" <%if (data.randomise == "YES") {%> checked<%}%>> Randomise questions?
+                        </label>
+                    </div>    
+                </div>
+                <div id="questions">
+                    <% for (question in data.questions) {%>
+                        <% if (data.questions[question].type == "true/false") {%>
+                            <div id="Question <%= question%>">
+                                Question <%= parseInt(question)+1%>: <input type="text" name="questions_<%= question%>_text" class="form-control" value="<%=data.questions[question].text%>"/> 
+                                <ul>
+                                    <li><input type="radio" name="questions_<%= question%>_correctOption" value="True" <%if (data.questions[question].correctOption == "True") {%> checked<%}%>>
+                                    True
+                                    </input></li>
+                                    <li><input type="radio" name="questions_<%= question%>_correctOption" value="False" <%if (data.questions[question].correctOption == "False") {%> checked<%}%>>
+                                        False
+                                    </input></li>
+                                </ul>
+                                <input type="hidden" name="question_<%= question%>_type"id="questionCount" value="true/false"/>
+                            </div>
+                        <%} else if (data.questions[question].type == "multipleChoice") {%>
+                            <div id="Question <%= question%>">
+                                Question <%= parseInt(question)+1%>: <input type="text" name="questions_<%= question%>_text" class="form-control" value="<%=data.questions[question].text%>"/> 
+                                <ul>
+                                    <%for (option in data.questions[question].Optiontext) {%>
+                                        <li><input type="radio" name="questions_<%= question%>_correctOption" value="<%= option%>" <%if (data.questions[question].correctOption == option) {%> checked<%}%>>
+                                        </input>
+                                        <input type="text" name="questions_<%= question%>_Optiontext" class="form-control" value=" <%= data.questions[question].Optiontext[option]%>">
+                                        </input>
+                                        </li>
+                                    <%}%>
+                                </ul>
+                                <input type="hidden" name="question_<%= question%>_type"id="questionCount" value="multipleChoice"/>
+                            </div>
+                        <%} else if (data.questions[question].type == "fillInTheBlank") {%>
+                            <div id="Question <%= question%>">
+                                Question <%= parseInt(question)+1%>: <input type="text" name="questions_<%= question%>_text" class="form-control" value="<%=data.questions[question].text%>"/> <br>
+                                Answer: <input type="text" name="questions_<%= question%>_correctOption" class="form-control" value="<%=data.questions[question].correctOption%>"/>
+                                Weight: <input type="text" name="questions_<%= question%>_weight" class="form-control" value="<%=data.questions[question].weight%>"/>
+                                <input type="hidden" name="question_<%= question%>_type"id="questionCount" value="fillInTheBlank"/>
+                            </div>
+                        <%} else if (data.questions[question].type == "essay") {%>
+                            <div id="Question <%= question%>">
+                                Question <%= parseInt(question)+1%>: <input type="text" name="questions_<%= question%>_text" class="form-control" value="<%=data.questions[question].text%>"/> <br>
+                                Answer: <input type="text" name="questions_<%= question%>_correctOption" class="form-control" value="<%=data.questions[question].correctOption%>"/>
+                                Weight: <input type="text" class="form-control" name="questions_<%= question%>_weight" value="<%=data.questions[question].weight%>"/>
+                                Marking Style: <input type="radio" name="questions_<%= question%>_markingstyle" value="EXACT" <%if (data.questions[question].markingstyle == "EXACT") {%> checked<%}%>> EXACT </input>
+                                <input type="radio" name="questions_<%= question%>_markingstyle" value="CONTAINS" <%if (data.questions[question].markingstyle == "CONTAINS") {%> checked<%}%>> CONTAINS </input>
+                                <input type="hidden" name="question_<%= question%>_type"id="questionCount" value="essay"/>
+                            </div>
+                        <%}%>
+                    <%}%>
+                    <button type="button" class="btn btn-default" id="addQuestionBtn" aria-label="Left Align">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Question
+                    </button>
+                    <input type="hidden" id="questionCount" value="<%= data.questions.length%>"/>
+                    <input type="hidden" name="creator_username"id="questionCount" value="<%= data.creator_username%>"/>
+                </div>
+                <div id="submit">
+                    <button type="submit" class="btn btn-default">Save Changes</button>
+                </div>
+            </form>
+            <%} else { %>
+            <h3>You must be logged in to view this page. <a href="login">Log in</a></h3>
+        <% } %>
+        </div> 
+        <script type="text/javascript">
+            var main = function() {
+    
+    $("#addQuestionBtn").click(function addQuestion() {
+        var selectorPresent = document.getElementById("questionTypeDropDown");
+        if (selectorPresent == null) {
+
+            $( "#questions" ).append(addQuestionTypeSelector());
+                questionCount++;
+                /* Question type drop down event listeners*/
+                $("#questionTypeDropDown").change( function(e) {
+                e.preventDefault();
+                if ($(this).val()==='True/False') {
+                    $( "#questions" ).append(createTrueFalse());
+                    $("#questionTypeDropDownDiv").remove();
+
+                }
+                else if ($(this).val()==='Multiple Choice') {
+                    $( "#questions").append(addMultipleChoiceSelector());
+                    $("#numberOfOptionsDropdown").change (function(e) {
+                        e.preventDefault();
+                        $( "#questions" ).append(createMultipleChoice($(this).val()));
+                        $("#numberOfOptionsDropdownDiv").remove();
+                    });
+                    $("#questionTypeDropDownDiv").remove();
+                }
+                else if ($(this).val()==='Fill in the blank') {
+                    $( "#questions" ).append(createFillInTheBlank());
+                    $("#questionTypeDropDownDiv").remove();
+                }
+                else if ($(this).val()==='Essay') {
+                    $( "#questions" ).append(createEssay());
+                    $("#questionTypeDropDownDiv").remove();
+                }
+                else {
+                    return null;
+                }  
+            });
+        }
+        else {
+            null;
+        };
+    });
+    
+    // $("#createNewQuiz").submit(function(e) {
+    // });
+    
+};
+
+/*Question Type Constructors*/
+
+var questionTypes = ['Select Question Type', 'True/False', 'Multiple Choice', 'Fill in the blank','Essay'];
+
+function createQuestionInput() {
+    var questionText = $("<input/>")
+                                .attr('type', 'text')
+                                .attr('name', 'questions_'+questionCount+'_text')
+                                .attr('class', 'form-control')
+                                .attr('placeholder', 'Enter question here');
+                            //questionText.name = 'questions_'+questionCount+'][text]';
+    return questionText;
+};
+
+function createEssay() {
+    var essay = $('<div></div>');
+        essay.id = 'Question '+questionCount;
+        var response = $("<input/>")
+                                .attr('type', 'text')
+                                .attr('name', 'questions_'+questionCount+'_correctOption')
+                                .attr('class', 'form-control')
+                                .attr('placeholder', 'Enter answer here');
+
+        var exact = $('<input> EXACT </input>')
+                    exact.attr('type','radio')
+                    exact.attr('name', 'questions_'+questionCount+'_markingstyle')
+                    exact.attr('value', 'EXACT');
+                    
+        var contains = $('<input> CONTAINS </input>')
+                    contains.attr('type','radio')
+                    contains.attr('name', 'questions_'+questionCount+'_markingstyle')
+                    contains.attr('value', 'CONTAINS');
+
+        var weight = $("<input/>")
+                                .attr('type', 'text')
+                                .attr('name', 'questions_'+questionCount+'_weight')
+                                .attr('class', 'form-control')
+                                .attr('placeholder', 'Question weight');
+
+
+        essay.append(createQuestionInput);
+        essay.append(response);
+        essay.append(exact);
+        essay.append(contains);
+        essay.append(weight);
+        essay.append($('<input />').attr('name','questions_'+questionCount+'_type').attr('value','essay').attr('type', 'hidden'));
+        essay.append(addDeleteButton());
+
+        return essay;
+};
+
+function createFillInTheBlank() {
+    var fillInTheBlank = $('<div></div>');
+        fillInTheBlank.id = 'Question '+questionCount;
+        var response = $("<input/>")
+                                .attr('type', 'text')
+                                .attr('name', 'questions_'+questionCount+'_correctOption')
+                                .attr('class', 'form-control')
+                                .attr('placeholder', 'Enter answer here');
+
+        var weight = $("<input/>")
+                                .attr('type', 'text')
+                                .attr('name', 'questions_'+questionCount+'_weight')
+                                .attr('class', 'form-control')
+                                .attr('placeholder', 'Question weight');
+
+
+        fillInTheBlank.append(createQuestionInput);
+        fillInTheBlank.append(response);
+        fillInTheBlank.append(weight);
+        fillInTheBlank.append($('<input />').attr('name','questions_'+questionCount+'_type').attr('value','fillInTheBlank').attr('type', 'hidden'));
+        fillInTheBlank.append(addDeleteButton());
+
+        return fillInTheBlank;
+}
+// question_123_type
+
+function createTrueFalse() {
+                var trueFalse = $('<div></div>');
+                    trueFalse.id = 'Question '+questionCount;
+                        var trueChoice = document.createElement("input");
+                            trueChoice.type = 'radio';
+                            trueChoice.name = 'questions_'+questionCount+'_correctOption';
+                            trueChoice.innerHTML = 'True';
+                            trueChoice.value = 'True';
+                        var falseChoice = document.createElement("input");
+                            falseChoice.type = 'radio';
+                            falseChoice.name = 'questions_'+questionCount+'_correctOption';
+                            falseChoice.innerHTML = 'False';
+                            falseChoice.value = 'False';
+    
+                    trueFalse.append(createQuestionInput());
+                    trueFalse.append(trueChoice);
+                    trueFalse.append(falseChoice);
+                    trueFalse.append($('<input />').attr('name','questions_'+questionCount+'_type').attr('value','true/false').attr('type', 'hidden'));
+                   trueFalse.append(addDeleteButton());
+                return trueFalse;
+            };
+
+function createMultipleChoice(numberOfOptions) {
+                
+                /* Question div element */
+                var multipleChoice =$('<div></div>');
+                    multipleChoice.id = 'Question '+questionCount;
+                
+                /* Append question input */
+                    multipleChoice.append(createQuestionInput());
+                
+                /* Append options */
+                    for (var i = 0; i < numberOfOptions; i++) {
+                        /* Choices Div element */
+                        var choice = $('<div></div>');
+                            choice.id = 'choice '+i; 
+                            /* Option elements */
+                            var possibleOption = document.createElement("input");
+                                possibleOption.type = 'radio';
+                                possibleOption.name = 'question_'+questionCount+'_correctOption';
+                                possibleOption.value = i;
+                            var option = $("<input/>")
+                                                .attr('type', 'text')
+                                                .attr('name', 'questions_'+questionCount+'_Optiontext')
+                                                .attr('class', 'form-control');
+                        
+                            /* Append options to choice div */
+                            choice.append(possibleOption);
+                            choice.append(option);
+                        
+                        /* Append choice to question*/
+                        multipleChoice.append(choice);
+
+                    };
+                        multipleChoice.append($('<input />').attr('name','questions_'+questionCount+'_type').attr('value','multipleChoice').attr('type', 'hidden'));
+                    multipleChoice.append(addDeleteButton());
+                return multipleChoice;
+            };
+
+/* Selectors */
+
+function addQuestionTypeSelector() {
+    var questionTypeDropDownDiv = document.createElement("div");
+            questionTypeDropDownDiv.id = 'questionTypeDropDownDiv';
+            var questionTypeDropDown = document.createElement("select");
+                questionTypeDropDown.id = 'questionTypeDropDown';
+                var classAtt = document.createAttribute("class");
+                classAtt.value = 'form-control';
+                questionTypeDropDown.setAttributeNode(classAtt);
+            for (var i = 0; i < questionTypes.length; i++) {
+                var option = document.createElement("option");
+                    option.id = 'questionType '+ (i+1);
+                    option.value = questionTypes[i];
+                    option.innerHTML = questionTypes[i];
+                questionTypeDropDown.appendChild(option);
+            questionTypeDropDownDiv.appendChild(questionTypeDropDown);
+            };
+    return questionTypeDropDownDiv;
+};
+
+function addMultipleChoiceSelector() {
+    var numberOfOptionsDiv = document.createElement("div");
+        numberOfOptionsDiv.id = 'numberOfOptionsDiv';
+        
+        var numberOfOptionsDropdown = document.createElement("select");
+            numberOfOptionsDropdown.id = 'numberOfOptionsDropdown'
+            var classAtt = document.createAttribute("class");
+            classAtt.value = 'form-control';
+            numberOfOptionsDropdown.setAttributeNode(classAtt);
+    
+        var descriptionOption = document.createElement("option");
+                    descriptionOption.id = 'descriptionOption';
+                    descriptionOption.value = 'x';
+                    descriptionOption.innerHTML = 'Select number of options';
+                numberOfOptionsDropdown.appendChild(descriptionOption);
+        for (var i=1; i<5; i++) {
+            var option = document.createElement("option");
+                    option.id = 'option '+ (i+1);
+                    option.value = i+1;
+                    option.innerHTML = i+1;
+                numberOfOptionsDropdown.appendChild(option);
+            numberOfOptionsDiv.appendChild(numberOfOptionsDropdown);
+        };
+    return numberOfOptionsDiv;
+};
+
+/* Button Constructors */
+function addDeleteButton() {
+    var removeQuestion = $("<button></button>");
+        removeQuestion.attr('id', 'removeQuestion')
+                        .addClass(' btn btn-default')
+                        .text('Remove question')
+                        .on('click', function(){
+                        $(this).parent().remove();
+                        questionCount--;
+                        return false;
+                    });
+    return removeQuestion;
+};
+                          
+questionCount = $('#questionCount').val();
+$(document).ready(main);
+        </script>  
+    </body>
+    </body>
+</html>

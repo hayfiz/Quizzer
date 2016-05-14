@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="js/app.js"></script>
+<!--        <link rel="stylesheet" href="main.css">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+            <form id="takeQuiz" method="POST" action="takeQuiz">
+                <div id="quizNameDiv">
+                    <fieldset class="form-group">
+                        <input type="text" class="form-control" id="quizName" name="quizName"placeholder="Quiz name" required>
+                    </fieldset>
+                </div>
+                <div id="quizPasswordDiv">
+                    <fieldset class="form-group">
+                        <input type="password" class="form-control" id="pwd" name="pwd"placeholder="Password">
+                    </fieldset>
+                </div>
+                <div id="studentIdDiv">
+                    <fieldset class="form-group">
+                        <input type="text" class="form-control" id="studentID" name="studentID" placeholder="Student ID" required>
+                    </fieldset>
+                </div>
+                <div id="submit">
+                    <button type="submit" class="btn btn-default" id="submitbtn">Enter</button>
+                </div>
+            </form>
+        </div>  
+    </body>
+    <script type="text/javascript">
+
+        function checkQuizAvailability() {
+            var post = $('#quizName').val();
+            $.ajax({
+                        'url': 'checkQuizname',
+                        'type': 'POST',
+                        'data': {data: post},
+                        success: function (response) {
+                            console.log(response);
+                            if (response == 'valid') {
+                                $('#feeback').remove();
+                                $('#quizNameDiv').attr('class', 'form-group has-success has-feedback')
+                                .append('<span id="feeback" class="glyphicon glyphicon-ok form-control-feedback"></span>');
+                                $('#quizName').attr('class', 'form-control form-control-success');
+                                $("#submitbtn").prop('disabled', false);
+                            } else {
+                                $('#feeback').remove();
+                                $('#quizNameDiv').attr('class', 'form-group has-warning has-feedback')
+                                .append('<span id="feeback" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>');
+                                $('#quizName').attr('class', 'form-control form-control-warning');
+                                $("#submitbtn").prop('disabled', true);
+                            }
+                            }
+                        });
+        }
+
+       
+        $(document).ready(function() {
+            $('#quizName').keyup(function(e) {
+                checkQuizAvailability();
+            });
+        });
+    </script>
+</html>

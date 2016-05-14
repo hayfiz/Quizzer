@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src='bower_components/pdfmake/build/pdfmake.min.js'></script>
+        <script src='bower_components/pdfmake/build/vfs_fonts.js'></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+        <% if (isAuthenticated) {%>
+            <div class="row">
+                <div class="col-lg-9">
+                    <h1> Quizzes </h1>
+                </div>
+                <div class="col-lg-2" style="padding-top: 30px;">
+                    <a href="dashboard">Return to dashboard <span class="glyphicon glyphicon-chevron-left"></span></a>
+                </div>
+                <div class="col-lg-1" style="padding-top: 30px;">
+                    <a href="logout">Logout <span class="glyphicon glyphicon-user"></span></a>
+                </div>
+            </div>
+            
+            <div class="panel-group">
+                    <% for (var index = 0; index<data.length; index++) {%> 
+                    <%var str = data[index].quizName;
+                            var rep = str.replace(" ", "_");%>
+                    <div class="panel panel-default" id= "<%= rep %>">
+                        <div class="panel-heading">
+                            <div class= "col-md-6"> <%=data[index].quizName%> (<%=data[index].quizDescription%>)</div>
+                            <div class= "col-md-2">
+                                <div class= "col-md-1">
+                                    <input type="hidden" id="download_<%=index%>" value="<%= JSON.stringify(data[index]) %>" url="download_quiz" req="0">
+                                    <a href="#"><span id="download_<%=index%>" class="glyphicon glyphicon-download-alt"></span></a> 
+                                </div>
+                                <div class= "col-md-1">
+                                    <input type="hidden" id="print_<%=index%>" value="<%= JSON.stringify(data[index]) %>" url="print_quiz" req="3">
+                                    <a href="#"><span id="print_<%=index%>"class="glyphicon glyphicon-print"></span></a>
+                                </div>
+                            </div>
+                            <div class= "col-md-1">
+                                <input type="hidden" id="preview_<%=index%>" value="<%= JSON.stringify(data[index]) %>" url="preview_quiz" req="1">
+                                <a href="#" id="preview_<%=index%>">Preview</a>
+                            </div>
+                            <div class= "col-md-1">
+                               <input type="hidden" id="edit_<%=index%>" value="<%= JSON.stringify(data[index]) %>" url="edit_quiz" req="1">
+                                <a href="#" id="edit_<%=index%>">Edit</a>
+                            </div>
+                            <%if (data[index].active != true) {%>
+                            <div class= "col-md-1">
+                                <input type="hidden" id="activate_<%=index%>" value="<%= JSON.stringify(data[index]) %>" url="activate_quiz" req="1">
+                                <a href="#" id="activate_<%=index%>">Activate</a>
+                            </div>
+                            <%} else {%>
+                                <div class= "col-md-1">
+                                <input type="hidden" id="deactivate_<%=index%>" value="<%= JSON.stringify(data[index]) %>" url="deactivate_quiz" req="1">
+                                    <a href="#" id="deactivate_<%=index%>">Deactivate</a>
+                                </div>
+                            <%} %>
+                            <div>
+                                <input type="hidden" id="delete_<%=index%>" value="<%= JSON.stringify(data[index]) %>" url="delete_quiz" req="2">
+                                <a href="#" id="delete_<%=index%>">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                    <%}%>
+            </div>
+            <div class= "col-md-4">
+                
+            </div>
+            <div class= "col-md-8 ">
+                <a href="admin_create_quiz"><button type="button" class="btn btn-primary">Would you like to create a new quiz?</button></a>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Download</h4>
+                  </div>
+                  <div class="modal-body">
+                    Your download has started.
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div> <!-- /Modal -->
+            <%} else { %>
+            <h3>You must be logged in to view this page. <a href="login">Log in</a></h3>
+        <% } %>
+        </div>
+        <script type="text/javascript">
+            function getData(selector) {
+                //retreive parameters
+                var post = $("#"+selector).val();
+                var url = $("#"+selector).attr('url');
+                var req = $("#"+selector).attr('req');
+                
+                if (req == 0) { //ajax request
+                        $.ajax({
+                        'url': url,
+                        'type': 'POST', 
+                        'data': {data: post},
+                        success: function (response) {
+                            $('#myModal').modal('show');
+                        }
+                    });
+                }
+                else if (req == 1) { //hidden form request
+                    //console.log(post);
+                    var form = $("<form></form>");
+                        form.attr('action', url)
+                            .attr('method', 'POST');
+                        form.append($('<input />').attr('name','data').attr('value',post).attr('type', 'hidden'));
+
+                     form.submit();
+                    }
+                else if (req == 2) { //alternate ajax request
+                    $.ajax({
+                        'url': url,
+                        'type': 'POST',
+                        'data': {data: post},
+                        success: function (response) {
+                            var str = response.quizName;
+                            var rep = str.replace(" ", "_");
+                            $('#'+rep).remove();
+                            }
+                        });
+                    } else if (req==3) {    //print request
+                        data = JSON.parse(post);
+
+                        reqd = {};
+                        reqd.quizName = data.quizName;
+                        reqd.quizDescription = data.quizDescription;
+                        reqd.questions = data.questions;
+
+
+                        printData = [];
+
+                        function parser(data) {
+                            var staticKeys = ['quizName','quizDescription'];
+                            var i = 0;
+                            for (key in data) {
+                                if (staticKeys.indexOf(key) > -1) {
+                                    printData[i] = {text: data[key]+'\n'+' '+'\n', style: 'header'};
+                                    i++;
+                                } else {
+                                    printData[i] = [];
+                                    for (var j = 0; j<data[key].length; j++) {
+                                        printData[i][j] = {text: data[key][j].text+'\n'+' '+'\n'};
+                                    }
+                                }
+                            }
+                        }
+
+                        parser(reqd);
+                        console.log(printData);
+                        var docDefinition = {
+                            // a string or { width: number, height: number }
+                              pageSize: 'A4',
+                              // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
+                                content: printData,
+
+                                styles: {
+                                    header: {
+                                       fontSize: 15,
+                                       bold: true
+                                     },
+                                     description: {
+                                        fontSize: 15,
+                                        bold: true
+                                     }
+                                } 
+
+
+                     };
+                             // print the PDF
+                                pdfMake.createPdf(docDefinition).print();
+                    }
+                
+            };
+
+            $(document).ready(function () {
+                //click event listner
+                $('.panel-group').click(function (e) {
+                    if (e.target !== e.currentTarget) {
+                           var selector = e.target.id;
+                           e.preventDefault();
+                           getData(selector);
+                     };
+               });
+            });
+        </script>
+        
+
+    </body>
+</html>

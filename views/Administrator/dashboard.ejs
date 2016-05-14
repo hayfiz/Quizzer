@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <title> Quizzer </title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="col-lg-8">
+                <img src="QuizzerMin.png" id="logo-min">
+            </div>
+            <% if (isAuthenticated) {%>
+            <div class="col-md-11">
+                <h1>Welcome, <%=username%></h1>
+            </div>
+            <div class="col-md-1" id="dash-control">
+                <a href="logout">Logout <span class="glyphicon glyphicon-user"></span></a>
+            </div>
+            <div class="col-md-8">
+                <h3>Admin Dashboard</h3>
+                <div class="panel-group">
+                <div class="panel-heading">
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading"><a href="admin_create_quiz"> Create new quiz <span class="glyphicon glyphicon-plus"></span></a>
+                    </div>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading"><a href="quizzes"> Quizzes <span class="glyphicon glyphicon-file"></span></a></div>
+                </div>
+                <div class="panel <%if (unevaluated <= 0) {%> 
+                    panel-success 
+                    <%} else {%>
+                    panel-danger
+                    <%}%>   
+                    ">
+                    <div class="panel-heading">
+                    <a href="responses"> Quiz Responses <%if (unevaluated > 0) {%> 
+                    (<%= unevaluated %>) 
+                    <%} %>
+                    <span class="glyphicon glyphicon-flag"></span></a></div>
+                </div>
+                <div class="panel <%if (unevaluated <= 0) {%> 
+                    panel-success 
+                    <%} else {%>
+                    panel-warning
+                    <%}%>
+                    ">
+                    <div class="panel-heading">
+                    <a href="reports"> Quiz Reports
+                    <span class="glyphicon glyphicon-education"></span></a></div>
+                </div>
+                <div class="panel <%if (feedback <= 0) {%> 
+                    panel-success 
+                    <%} else {%>
+                    panel-warning
+                    <%}%>">
+                    <div class="panel-heading">
+                    <a href="feedback"> Feedback <%if (feedback > 0) {%> 
+                    (<%=feedback%>) 
+                    <%} %>
+                    <span class="glyphicon glyphicon-share-alt"></span></a></div>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading"><a href="export"> Export data <span class="glyphicon glyphicon-download-alt"></span></a></div>
+                </div>
+            </div>
+            </div>
+            <div class="col-md-4 list-group" id="rectangle">
+                <div id="active_rect" class="list-group-item">
+                    <h5>
+                        <a href="quizzes" id="active_link"> Active Quizzes <%if (active > 0) {%> 
+                        (<%=active%>) 
+                        <%} %> </a>
+                    </h5>
+                </div>
+                <div id="pool_rect" class="list-group-item">
+                    <h5>
+                        <a href="question_pools" id="pool_link"> Question pools </a>
+                    </h5>
+                </div>
+            </div>
+                
+        <%} else { %>
+            <h3>You must be logged in to view this page. <a href="login">Log in</a></h3>
+        <% } %>
+        </div>
+    </body>
+</html>
